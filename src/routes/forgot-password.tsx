@@ -45,7 +45,7 @@ function ForgotPasswordPage() {
   return (
     <AuthScreen>
       <div className="mb-8">
-        <p className="font-display text-sm text-muted">ブレインノート</p>
+        <p className="font-display text-sm text-muted">題箋</p>
         <h1 className="mt-1 font-display text-3xl font-medium tracking-tight">
           パスワードの再設定
         </h1>

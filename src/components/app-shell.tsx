@@ -67,7 +67,7 @@ export function AppHeader({ user }: { user: AppUser }) {
           <span className="grid size-8 place-items-center rounded-[10px] bg-accent text-accent-fg">
             <BookMarked className="size-4" />
           </span>
-          ブレインノート
+          題箋
         </Link>
         <AuthSlot user={user} />
       </div>

@@ -10,7 +10,7 @@ import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 
-const APP_NAME = "ブレインノート";
+const APP_NAME = "題箋";
 
 const fetchSessionUser = createServerFn({ method: "GET" }).handler(async () => {
   const { getSessionUser } = await import("@/lib/auth/verify.server");
@@ -27,7 +27,7 @@ export const Route = createRootRoute({
       { title: APP_NAME },
       {
         name: "description",
-        content: "知識やメモを、ひとつの場所に残すノートです。",
+        content: "題箋 — メモに題名をつけ、ひとつの場所に残すノートです。",
       },
       { name: "theme-color", content: "#2F4A3C" },
     ],

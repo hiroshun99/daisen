@@ -171,7 +171,7 @@ export async function buildNotebookPdf(
   };
   paintPage(cursor.page);
 
-  cursor.page.drawText(clean("ブレインノート"), {
+  cursor.page.drawText(clean("題箋"), {
     x: MARGIN,
     y: cursor.y - 10,
     size: 10,
