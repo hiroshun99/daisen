@@ -103,10 +103,19 @@ const LOCAL_DEV_ORIGINS: string[] = [
   "http://127.0.0.1:8080",
   "http://[::1]:8080",
 ];
+// Public Vercel hosts so email/password works outside grok.me.
+const PUBLIC_HOSTS: string[] = ["*.vercel.app"];
+const PUBLIC_ORIGINS: string[] = PUBLIC_HOSTS.map((host) => `https://${host}`);
 const baseURL = explicitBaseURL ?? {
   // Include loopback hosts so dynamic baseURL resolves for local email/password
   // (not only the preview wildcard).
-  allowedHosts: [...previewAllowedHosts, "localhost", "127.0.0.1", "[::1]"],
+  allowedHosts: [
+    ...previewAllowedHosts,
+    ...PUBLIC_HOSTS,
+    "localhost",
+    "127.0.0.1",
+    "[::1]",
+  ],
   // `auto` → trust both http:// and https:// expansions of allowedHosts
   // (preview is https; local dev is http).
   protocol: "auto" as const,
@@ -116,12 +125,14 @@ const baseURL = explicitBaseURL ?? {
 // Origins Better Auth accepts on credentialed POSTs (sign-up/sign-in, etc.).
 // Missing entries here surface as FORBIDDEN "Invalid origin".
 const trustedOrigins: string[] = explicitBaseURL
-  ? [explicitBaseURL, ...LOCAL_DEV_ORIGINS]
+  ? [explicitBaseURL, ...PUBLIC_ORIGINS, ...PUBLIC_HOSTS, ...LOCAL_DEV_ORIGINS]
   : [
       // Host wildcards (matched against Origin's host)
       ...previewAllowedHosts,
+      ...PUBLIC_HOSTS,
       // Full-origin wildcards (matched against Origin)
       ...previewAllowedHosts.flatMap((host) => [`https://${host}`, `http://${host}`]),
+      ...PUBLIC_ORIGINS,
       ...LOCAL_DEV_ORIGINS,
     ];
 
