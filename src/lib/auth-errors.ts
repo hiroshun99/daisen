@@ -33,5 +33,13 @@ export function registerFailedMessage(error: unknown): string {
   if (raw.includes("origin") || raw.includes("csrf")) {
     return "登録できませんでした。ページを再読み込みして、もう一度お試しください。";
   }
+  if (
+    raw.includes("500") ||
+    raw.includes("internal") ||
+    raw.includes("database") ||
+    raw.includes("failed to fetch")
+  ) {
+    return "いま登録できません。少し待ってから、もう一度お試しください。";
+  }
   return "登録できませんでした。入力内容を確認して、もう一度お試しください。";
 }
