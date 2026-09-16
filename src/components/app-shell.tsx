@@ -17,7 +17,7 @@ import {
   type AppUser,
 } from "@/lib/auth/use-current-user";
 import { signOutToLogin } from "@/lib/session-token";
-import { safeRedirectPath } from "@/lib/utils";
+import { redirectPathFromLocations, safeRedirectPath } from "@/lib/utils";
 
 const subscribeToNothing = () => () => {};
 const noGateSessionOnServer = () => false;
@@ -77,7 +77,14 @@ export function AppHeader({ user }: { user: AppUser }) {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, isPending } = useCurrentUserState();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const routerPath = useRouterState({
+    select: (s) => `${s.location.pathname}${s.location.searchStr}`,
+  });
+  const browserPath = useSyncExternalStore(
+    subscribeToNothing,
+    () => `${window.location.pathname}${window.location.search}`,
+    () => "",
+  );
 
   if (isPending) {
     return (
@@ -97,7 +104,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     return (
       <Navigate
         to="/login"
-        search={{ redirect: safeRedirectPath(pathname) }}
+        search={{
+          redirect: redirectPathFromLocations(routerPath, browserPath),
+        }}
       />
     );
   }

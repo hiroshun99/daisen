@@ -30,3 +30,18 @@ export function safeRedirectPath(value: unknown): string {
   }
   return value;
 }
+
+/**
+ * Prefer the browser URL when sending signed-out visitors to login.
+ * TanStack's location can still be `/` on the first paint of `/settings`.
+ */
+export function redirectPathFromLocations(
+  routerPath: string,
+  browserPath?: string | null,
+): string {
+  const chosen =
+    typeof browserPath === "string" && browserPath.length > 0
+      ? browserPath
+      : routerPath;
+  return safeRedirectPath(chosen);
+}
