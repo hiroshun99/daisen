@@ -26,7 +26,8 @@ describe("redirectPathFromLocations", () => {
     );
   });
 
-  it("falls back to the router path when the browser path is empty", () => {
+  it("keeps the router path when the browser still reports /", () => {
+    assert.equal(redirectPathFromLocations("/settings", "/"), "/settings");
     assert.equal(redirectPathFromLocations("/settings", ""), "/settings");
     assert.equal(redirectPathFromLocations("/settings", null), "/settings");
   });

@@ -75,34 +75,39 @@ export function AppHeader({ user }: { user: AppUser }) {
   );
 }
 
+function ShellSkeleton() {
+  return (
+    <div className="min-h-dvh bg-bg text-fg">
+      <div className="mx-auto flex h-14 max-w-3xl items-center px-4">
+        <div className="h-8 w-36 animate-pulse rounded-[var(--radius-sm)] bg-surface-2" />
+      </div>
+      <div className="mx-auto max-w-3xl px-4 py-8">
+        <div className="h-8 w-48 animate-pulse rounded-[var(--radius-sm)] bg-surface-2" />
+        <div className="mt-6 h-24 animate-pulse rounded-[var(--radius-lg)] bg-surface-2" />
+      </div>
+    </div>
+  );
+}
+
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, isPending } = useCurrentUserState();
   const routerPath = useRouterState({
     select: (s) => `${s.location.pathname}${s.location.searchStr}`,
   });
-  const browserPath = useSyncExternalStore(
-    subscribeToNothing,
-    () => `${window.location.pathname}${window.location.search}`,
-    () => "",
-  );
+  const [browserPath, setBrowserPath] = useState<string | null>(null);
 
-  if (isPending) {
-    return (
-      <div className="min-h-dvh bg-bg text-fg">
-        <div className="mx-auto flex h-14 max-w-3xl items-center px-4">
-          <div className="h-8 w-36 animate-pulse rounded-[var(--radius-sm)] bg-surface-2" />
-        </div>
-        <div className="mx-auto max-w-3xl px-4 py-8">
-          <div className="h-8 w-48 animate-pulse rounded-[var(--radius-sm)] bg-surface-2" />
-          <div className="mt-6 h-24 animate-pulse rounded-[var(--radius-lg)] bg-surface-2" />
-        </div>
-      </div>
-    );
+  useEffect(() => {
+    setBrowserPath(`${window.location.pathname}${window.location.search}`);
+  }, []);
+
+  if (isPending || (!user && browserPath === null)) {
+    return <ShellSkeleton />;
   }
 
   if (!user) {
     return (
       <Navigate
+        replace
         to="/login"
         search={{
           redirect: redirectPathFromLocations(routerPath, browserPath),
@@ -130,7 +135,14 @@ export function AuthScreen({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
-    if (!isPending && user) {
+    if (isPending || !user) return;
+    const path = router.state.location.pathname;
+    if (
+      path.startsWith("/login") ||
+      path.startsWith("/register") ||
+      path.startsWith("/forgot-password") ||
+      path.startsWith("/reset-password")
+    ) {
       router.history.replace(redirect);
     }
   }, [isPending, user, redirect, router]);
