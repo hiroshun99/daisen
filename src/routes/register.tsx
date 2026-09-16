@@ -13,6 +13,7 @@ import {
   normalizeDisplayName,
   normalizeEmail,
   validateDisplayName,
+  validatePassword,
 } from "@/lib/notebooks/validation";
 import { persistSessionTokenFromAuthResponse } from "@/lib/session-token";
 import { safeRedirectPath } from "@/lib/utils";
@@ -47,8 +48,9 @@ function RegisterPage() {
       setError("メールアドレスの形式が正しくありません。");
       return;
     }
-    if (password.length < LIMITS.passwordMin) {
-      setError(`パスワードは${LIMITS.passwordMin}文字以上にしてください。`);
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
       return;
     }
     if (password !== confirm) {
@@ -121,7 +123,7 @@ function RegisterPage() {
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="password">パスワード（8文字以上）</Label>
+          <Label htmlFor="password">パスワード（8〜72文字、英字と数字）</Label>
           <Input
             id="password"
             type="password"
@@ -130,6 +132,7 @@ function RegisterPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={LIMITS.passwordMin}
+            maxLength={LIMITS.passwordMax}
           />
         </div>
         <div className="space-y-1.5">
@@ -142,6 +145,7 @@ function RegisterPage() {
             onChange={(e) => setConfirm(e.target.value)}
             required
             minLength={LIMITS.passwordMin}
+            maxLength={LIMITS.passwordMax}
           />
         </div>
         {error ? <p className="text-sm text-danger">{error}</p> : null}

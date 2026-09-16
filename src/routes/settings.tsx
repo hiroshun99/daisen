@@ -14,6 +14,7 @@ import {
   LIMITS,
   normalizeDisplayName,
   validateDisplayName,
+  validatePassword,
 } from "@/lib/notebooks/validation";
 
 export const Route = createFileRoute("/settings")({
@@ -65,10 +66,10 @@ function SettingsForm() {
 
   const savePassword = useMutation({
     mutationFn: async () => {
-      if (newPassword.length < LIMITS.passwordMin) {
-        const error = `パスワードは${LIMITS.passwordMin}文字以上にしてください。`;
-        setPasswordError(error);
-        throw new Error(error);
+      const passwordError = validatePassword(newPassword);
+      if (passwordError) {
+        setPasswordError(passwordError);
+        throw new Error(passwordError);
       }
       if (newPassword !== confirmPassword) {
         const error = "新しいパスワードが一致しません。";
@@ -180,7 +181,7 @@ function SettingsForm() {
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="new-password">新しいパスワード（8文字以上）</Label>
+          <Label htmlFor="new-password">新しいパスワード（8〜72文字、英字と数字）</Label>
           <Input
             id="new-password"
             type="password"
@@ -193,6 +194,7 @@ function SettingsForm() {
             }}
             required
             minLength={LIMITS.passwordMin}
+            maxLength={LIMITS.passwordMax}
           />
         </div>
         <div className="space-y-1.5">
@@ -209,6 +211,7 @@ function SettingsForm() {
             }}
             required
             minLength={LIMITS.passwordMin}
+            maxLength={LIMITS.passwordMax}
           />
         </div>
         {passwordError ? (

@@ -6,6 +6,7 @@ export const LIMITS = {
   tagsMaxCount: 10,
   summaryMax: 500,
   passwordMin: 8,
+  passwordMax: 72,
   nameMax: 40,
 } as const;
 
@@ -28,6 +29,22 @@ export function validateDisplayName(name: string): string | null {
   if (!normalized) return "表示名を入力してください。";
   if (normalized.length > LIMITS.nameMax) {
     return `表示名は${LIMITS.nameMax}文字以内にしてください。`;
+  }
+  return null;
+}
+
+export function validatePassword(password: string): string | null {
+  if (!password) return "パスワードを入力してください。";
+  if (password.length < LIMITS.passwordMin) {
+    return `パスワードは${LIMITS.passwordMin}文字以上にしてください。`;
+  }
+  if (password.length > LIMITS.passwordMax) {
+    return `パスワードは${LIMITS.passwordMax}文字以内にしてください。`;
+  }
+  const hasLetter = /[A-Za-z]/u.test(password);
+  const hasDigit = /\d/u.test(password);
+  if (!hasLetter || !hasDigit) {
+    return "パスワードは英字と数字の両方を含めてください。";
   }
   return null;
 }

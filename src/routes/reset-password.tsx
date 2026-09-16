@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { completePasswordReset } from "@/lib/account/api";
-import { LIMITS } from "@/lib/notebooks/validation";
+import { LIMITS, validatePassword } from "@/lib/notebooks/validation";
 
 export const Route = createFileRoute("/reset-password")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -29,8 +29,9 @@ function ResetPasswordPage() {
       setError("再設定用のリンクが無効です。もう一度お手続きください。");
       return;
     }
-    if (password.length < LIMITS.passwordMin) {
-      setError(`パスワードは${LIMITS.passwordMin}文字以上にしてください。`);
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
       return;
     }
     if (password !== confirm) {
@@ -77,7 +78,7 @@ function ResetPasswordPage() {
       ) : (
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="password">新しいパスワード（8文字以上）</Label>
+            <Label htmlFor="password">新しいパスワード（8〜72文字、英字と数字）</Label>
             <Input
               id="password"
               type="password"
@@ -86,6 +87,7 @@ function ResetPasswordPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={LIMITS.passwordMin}
+              maxLength={LIMITS.passwordMax}
             />
           </div>
           <div className="space-y-1.5">
@@ -98,6 +100,7 @@ function ResetPasswordPage() {
               onChange={(e) => setConfirm(e.target.value)}
               required
               minLength={LIMITS.passwordMin}
+              maxLength={LIMITS.passwordMax}
             />
           </div>
           {error ? <p className="text-sm text-danger">{error}</p> : null}

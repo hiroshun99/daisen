@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getSql } from "@/lib/db";
-import { LIMITS, isValidEmail, normalizeEmail } from "@/lib/notebooks/validation";
+import { isValidEmail, normalizeEmail, validatePassword } from "@/lib/notebooks/validation";
 
 const RESET_TTL_MS = 30 * 60 * 1000;
 const RESET_PREFIX = "app-reset:";
@@ -60,11 +60,9 @@ export const completePasswordReset = createServerFn({ method: "POST" })
     if (!data.token) {
       return { ok: false, error: "再設定用のリンクが無効です。もう一度お手続きください。" };
     }
-    if (data.password.length < LIMITS.passwordMin) {
-      return {
-        ok: false,
-        error: `パスワードは${LIMITS.passwordMin}文字以上にしてください。`,
-      };
+    const passwordError = validatePassword(data.password);
+    if (passwordError) {
+      return { ok: false, error: passwordError };
     }
     const sql = await getSql();
     const rows = await sql.query<{ value: string; expiresAt: string | Date }>(

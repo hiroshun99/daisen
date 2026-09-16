@@ -8,6 +8,7 @@ import {
   validateConfirm,
   validateDisplayName,
   validateDraft,
+  validatePassword,
 } from "./validation.ts";
 
 describe("body limit", () => {
@@ -72,6 +73,39 @@ describe("display name", () => {
       validateDisplayName(name),
       `表示名は${LIMITS.nameMax}文字以内にしてください。`,
     );
+  });
+});
+
+describe("password", () => {
+  it("rejects short passwords", () => {
+    assert.equal(
+      validatePassword("Ab1"),
+      `パスワードは${LIMITS.passwordMin}文字以上にしてください。`,
+    );
+  });
+
+  it("rejects passwords over 72 characters", () => {
+    const password = `A1${"b".repeat(LIMITS.passwordMax)}`;
+    assert.equal(
+      validatePassword(password),
+      `パスワードは${LIMITS.passwordMax}文字以内にしてください。`,
+    );
+  });
+
+  it("requires a letter and a digit", () => {
+    assert.equal(
+      validatePassword("abcdefgh"),
+      "パスワードは英字と数字の両方を含めてください。",
+    );
+    assert.equal(
+      validatePassword("12345678"),
+      "パスワードは英字と数字の両方を含めてください。",
+    );
+  });
+
+  it("accepts 8 to 72 mixed passwords", () => {
+    assert.equal(validatePassword("Passw0rd"), null);
+    assert.equal(validatePassword(`A1${"c".repeat(70)}`), null);
   });
 });
 
