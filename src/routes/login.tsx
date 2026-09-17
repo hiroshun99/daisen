@@ -67,7 +67,7 @@ function LoginPage() {
           ログイン
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-muted">
-          登録したメールアドレスとパスワードで入ってください。
+          貼った本文と、付けた題箋を取りにいく。
         </p>
       </div>
       <form onSubmit={onSubmit} className="space-y-4">

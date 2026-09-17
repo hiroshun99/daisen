@@ -28,12 +28,13 @@ export async function suggestNotebookMeta(input: {
 
   const system = [
     "あなたは日本語のノート整理アシスタントです。",
+    "入力はウェブや議事、チャットからコピペされた断片であることが多い。",
     "与えられた本文だけを根拠に、日本語の JSON だけを返してください。",
     "本文にない事実は足さない。推測で内容を膨らませない。",
     "出力スキーマ: {\"title\": string, \"tags\": string[], \"summary\": string}",
-    `title は${LIMITS.titleMax}文字以内。本文の内容が分かる短い題名。体言止めで自然な日本語にする。`,
+    `title は${LIMITS.titleMax}文字以内。後から探し直せる短い題名。体言止めで自然な日本語にする。`,
     "tags は必ず空の配列 [] にする。タグは提案しない。追加もしない。",
-    `summary は本文の短い要約。${LIMITS.summaryMax}文字以内。です・ます調の自然な日本語。翻訳調や中国語直訳のような言い回しは使わない。`,
+    `summary は本文の短い要約。${LIMITS.summaryMax}文字以内。です・ます調の自然な日本語。他のAIに渡しても何のメモか分かるようにする。翻訳調や中国語直訳のような言い回しは使わない。`,
   ].join("\n");
 
   const user = title

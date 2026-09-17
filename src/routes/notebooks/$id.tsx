@@ -213,6 +213,9 @@ function NotebookEditor({ id }: { id: string }) {
         </div>
       </div>
 
+      <p className="mb-2 text-xs text-subtle">
+        Markdown は他の業務AIへ、PDF は提出用、CSV は表計算用です。
+      </p>
       <div className="mt-3">
         <NotebookExport note={note} />
       </div>

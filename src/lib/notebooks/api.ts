@@ -7,6 +7,7 @@ import {
   sanitizeTags,
   validateConfirm,
 } from "./validation";
+import { SAMPLE_NOTEBOOKS } from "./samples";
 
 export type Notebook = {
   id: string;
@@ -21,6 +22,7 @@ export type Notebook = {
 export type NotebookListItem = {
   id: string;
   title: string;
+  summary: string;
   tags: string[];
   createdAt: string;
 };
@@ -74,8 +76,8 @@ export const listNotebooks = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<NotebookListItem[]> => {
     const sql = await getSql();
     const rows = await sql<
-      Pick<NotebookRow, "id" | "title" | "created_at">
-    >`select id, title, created_at from notebooks where user_id = ${context.userId} order by created_at desc`;
+      Pick<NotebookRow, "id" | "title" | "summary" | "created_at">
+    >`select id, title, summary, created_at from notebooks where user_id = ${context.userId} order by created_at desc`;
     const tagMap = await tagsFor(
       sql,
       rows.map((r) => r.id),
@@ -83,8 +85,34 @@ export const listNotebooks = createServerFn({ method: "GET" })
     return rows.map((row) => ({
       id: row.id,
       title: row.title,
+      summary: row.summary,
       tags: tagMap.get(row.id) ?? [],
       createdAt: toIso(row.created_at),
+    }));
+  });
+
+export const listNotebooksForExport = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .handler(async ({ context }): Promise<Notebook[]> => {
+    const sql = await getSql();
+    const rows = await sql<NotebookRow>`
+      select id, title, body, summary, created_at, updated_at
+      from notebooks
+      where user_id = ${context.userId}
+      order by created_at desc
+    `;
+    const tagMap = await tagsFor(
+      sql,
+      rows.map((r) => r.id),
+    );
+    return rows.map((row) => ({
+      id: row.id,
+      title: row.title,
+      body: row.body,
+      summary: row.summary,
+      tags: tagMap.get(row.id) ?? [],
+      createdAt: toIso(row.created_at),
+      updatedAt: toIso(row.updated_at),
     }));
   });
 
@@ -165,6 +193,29 @@ export const createNotebook = createServerFn({ method: "POST" })
     `;
     await replaceTags(sql, id, tags);
     return { id };
+  });
+
+export const seedSampleNotebooks = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .handler(async ({ context }): Promise<{ created: number }> => {
+    const sql = await getSql();
+    const existing = await sql<{ count: number }>`
+      select count(*)::int as count from notebooks where user_id = ${context.userId}
+    `;
+    if ((existing[0]?.count ?? 0) > 0) {
+      return { created: 0 };
+    }
+    let created = 0;
+    for (const sample of SAMPLE_NOTEBOOKS) {
+      const id = crypto.randomUUID();
+      await sql`
+        insert into notebooks (id, user_id, title, body, summary, created_at, updated_at)
+        values (${id}, ${context.userId}, ${sample.title}, ${sample.body}, ${sample.summary}, now(), now())
+      `;
+      await replaceTags(sql, id, sample.tags);
+      created += 1;
+    }
+    return { created };
   });
 
 export const updateNotebook = createServerFn({ method: "POST" })

@@ -103,14 +103,35 @@ function CreateNotebookForm() {
   return (
     <div>
       <p className="text-sm text-muted">
-        {step === "draft" ? "作成" : "保存前の確認"}
+        {step === "draft" ? "貼り付け" : "保存前の確認"}
       </p>
       <h1 className="mt-1 font-display text-3xl font-medium tracking-tight">
-        {step === "draft" ? "新しいノート" : "内容を確認"}
+        {step === "draft" ? "本文を貼る" : "題と要約を確認"}
       </h1>
 
       {step === "draft" ? (
         <form onSubmit={onAskSuggest} className="mt-8 space-y-5">
+          <div className="space-y-1.5">
+            <div className="flex items-baseline justify-between gap-3">
+              <Label htmlFor="body">貼り付ける本文</Label>
+              <CharCount value={body.length} max={LIMITS.bodyMax} />
+            </div>
+            <Textarea
+              id="body"
+              value={body}
+              disabled={busy}
+              onChange={(e) => setBody(e.target.value)}
+              placeholder="記事、議事、スレッド、AIの返答をここに貼り付けてください"
+              required
+              autoFocus
+            />
+            {errors.body ? (
+              <p className="text-sm text-danger">{errors.body}</p>
+            ) : draftErrors.body && body.length > LIMITS.bodyMax ? (
+              <p className="text-sm text-danger">{draftErrors.body}</p>
+            ) : null}
+          </div>
+
           <div className="space-y-1.5">
             <div className="flex items-baseline justify-between gap-3">
               <Label htmlFor="title">タイトル（任意）</Label>
@@ -122,30 +143,10 @@ function CreateNotebookForm() {
               maxLength={LIMITS.titleMax}
               disabled={busy}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="空欄のままでも、あとで題名を提案します"
+              placeholder="空欄なら、本文から題を付けます"
             />
             {errors.title ? (
               <p className="text-sm text-danger">{errors.title}</p>
-            ) : null}
-          </div>
-
-          <div className="space-y-1.5">
-            <div className="flex items-baseline justify-between gap-3">
-              <Label htmlFor="body">本文</Label>
-              <CharCount value={body.length} max={LIMITS.bodyMax} />
-            </div>
-            <Textarea
-              id="body"
-              value={body}
-              disabled={busy}
-              onChange={(e) => setBody(e.target.value)}
-              placeholder="残しておきたいことを書いてください"
-              required
-            />
-            {errors.body ? (
-              <p className="text-sm text-danger">{errors.body}</p>
-            ) : draftErrors.body && body.length > LIMITS.bodyMax ? (
-              <p className="text-sm text-danger">{draftErrors.body}</p>
             ) : null}
           </div>
 
@@ -163,7 +164,7 @@ function CreateNotebookForm() {
                   準備しています…
                 </>
               ) : (
-                "保存する"
+                "題を付けて確認"
               )}
             </Button>
           </div>
@@ -176,7 +177,7 @@ function CreateNotebookForm() {
             </div>
           ) : (
             <p className="text-sm leading-relaxed text-muted">
-              タイトルと要約を直してから保存してください。まだ保存はされていません。タグは付けなくても構いません。
+              タイトルと要約を直してから保存してください。まだ保存はされていません。この要約は、あとで他のAIに渡すときの見出しになります。
             </p>
           )}
 

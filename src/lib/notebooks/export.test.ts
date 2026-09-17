@@ -3,7 +3,9 @@ import { readFile } from "node:fs/promises";
 import { describe, it } from "node:test";
 import {
   CSV_COLUMNS,
+  buildKnowledgeMarkdown,
   buildNotebookCsv,
+  buildNotebookMarkdown,
   csvEscape,
   exportFilename,
 } from "./export.ts";
@@ -51,10 +53,29 @@ describe("exportFilename", () => {
   it("uses notebook-{id}.{ext}", () => {
     assert.equal(exportFilename("abc-123", "csv"), "notebook-abc-123.csv");
     assert.equal(exportFilename("abc-123", "pdf"), "notebook-abc-123.pdf");
+    assert.equal(exportFilename("abc-123", "md"), "notebook-abc-123.md");
   });
 
   it("strips unsafe id characters", () => {
     assert.equal(exportFilename("../x", "csv"), "notebook-x.csv");
+  });
+});
+
+describe("buildNotebookMarkdown", () => {
+  it("puts title, summary, and body in a file other models can ingest", () => {
+    const md = buildNotebookMarkdown(sample);
+    assert.match(md, /^# 題名, "引用"/m);
+    assert.match(md, /> 一行の要約/);
+    assert.match(md, /本文の2行目, カンマあり/);
+  });
+});
+
+describe("buildKnowledgeMarkdown", () => {
+  it("joins multiple notes with separators", () => {
+    const md = buildKnowledgeMarkdown([sample, { ...sample, id: "2", title: "二件目" }]);
+    assert.match(md, /# 題箋ナレッジ/);
+    assert.match(md, /件数: 2/);
+    assert.match(md, /二件目/);
   });
 });
 

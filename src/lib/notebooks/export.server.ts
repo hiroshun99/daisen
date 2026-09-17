@@ -4,6 +4,7 @@ import { requireUserId } from "@/lib/auth/verify.server";
 import { getSql } from "@/lib/db";
 import {
   buildNotebookCsv,
+  buildNotebookMarkdown,
   exportFilename,
   type ExportNotebook,
 } from "./export";
@@ -86,7 +87,7 @@ export async function handleNotebookExport(
 ): Promise<Response> {
   const url = new URL(request.url);
   const format = url.searchParams.get("format");
-  if (format !== "csv" && format !== "pdf") {
+  if (format !== "csv" && format !== "pdf" && format !== "md") {
     return new Response("形式を指定してください。", { status: 400 });
   }
   const inline = url.searchParams.get("inline") === "1";
@@ -113,6 +114,17 @@ export async function handleNotebookExport(
       status: 200,
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": disposition(kind, filename),
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (format === "md") {
+    return new Response(buildNotebookMarkdown(note), {
+      status: 200,
+      headers: {
+        "Content-Type": "text/markdown; charset=utf-8",
         "Content-Disposition": disposition(kind, filename),
         "Cache-Control": "no-store",
       },

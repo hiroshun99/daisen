@@ -27,7 +27,7 @@ export const Route = createRootRoute({
       { title: APP_NAME },
       {
         name: "description",
-        content: "題箋 — メモに題名をつけ、ひとつの場所に残すノートです。",
+        content: "題箋 — 乱立する情報を貼って残し、題と要約を付けてファイルとして持ち出すノートです。",
       },
       { name: "theme-color", content: "#2F4A3C" },
     ],

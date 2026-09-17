@@ -92,7 +92,7 @@ function RegisterPage() {
           新規登録
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-muted">
-          確認メールは届きません。登録するとすぐに使い始められます。
+          乱立するタブを、ノートにして持ち出せるようにします。確認メールは届きません。
         </p>
       </div>
       <form onSubmit={onSubmit} className="space-y-4">
