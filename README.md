@@ -2,7 +2,7 @@
 
 ノートを書いて保存し、タイトルと要約の提案を受けてから確定するアプリです。保存したノートは CSV / PDF でダウンロードできます。
 
-本番サイト: https://lilac-atlas-king-comet.grok.me
+本番サイト: https://daisen-5t5q.vercel.app
 
 ## できること
 
